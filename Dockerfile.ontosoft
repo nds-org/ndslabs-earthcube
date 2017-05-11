@@ -1,0 +1,17 @@
+FROM tomcat
+
+# Install JDK, Mavan, and Git
+RUN apt-get -qq update && \
+    apt-get -qq install --no-install-recommends \
+      git \
+      openjdk-8-jdk-headless \
+    apt-get -qq autoremove && \
+    apt-get -qq autoclean && \
+    apt-get -qq clean all && \
+    rm -rf /var/cache/apk/* 
+
+# Explode built WAR output into tomcat webapps directory
+ADD mv server/target/ontosoft-server-2.0-SNAPSHOT.war /usr/local/tomcat/webapps/ontosoft-server
+ADD mv client/target/ontosoft-client-2.0-SNAPSHOT.war /usr/local/tomcat/webapps/ontosoft-client
+
+COPY ontosoft.config.js /usr/local/tomcat/webapps/ontosoft-client/customise/config.js

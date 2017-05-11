@@ -1,0 +1,14 @@
+FROM python
+
+# Install git / psql
+RUN apt-get -qq update && \
+    apt-get -qq install \
+      git \
+      postgresql-client && \
+    apt-get -qq autoremove && \
+    apt-get -qq autoclean && \
+    apt-get -qq clean all && \
+    rm -rf /var/cache/apk/*
+
+COPY entrypoint.gdd.sh /entrypoint.sh    
+CMD [ "/entrypoint.sh" ]

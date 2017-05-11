@@ -1,0 +1,25 @@
+FROM tomcat
+
+# Install JDK, Mavan, and Git
+RUN apt-get -qq update && \
+    apt-get -qq install --no-install-recommends \
+      git \
+      openjdk-8-jdk-headless \
+      maven && \
+    apt-get -qq autoremove && \
+    apt-get -qq autoclean && \
+    apt-get -qq clean all && \
+    rm -rf /var/cache/apk/* 
+
+# Build OntoSoft from source
+RUN git clone https://github.com/IKCAP/ontosoft
+WORKDIR ontosoft
+RUN mvn clean install
+
+# Copy WAR build output to tomcat webapps directory
+RUN mv server/target/ontosoft-server-2.0-SNAPSHOT.war /usr/local/tomcat/webapps/ontosoft-server.war
+RUN mv client/target/ontosoft-client-2.0-SNAPSHOT.war /usr/local/tomcat/webapps/ontosoft-client.war
+
+COPY ontosoft.config.js .
+COPY entrypoint.ontosoft.sh entrypoint.sh
+CMD [ "./entrypoint.sh" ]
